@@ -152,6 +152,18 @@ const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getIte
     }
   }, [owner, currentTab]); // rerun the findLinks function if the tab is also changed
 
+//See the current open tab so the extension mode can be set to either person or company mode
+chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  // Store the URL and ID of the current tab.
+  const currentURL = tabs[0].url;
+  if (/^https:\/\/www\.linkedin\.com\/in\/[^\/]{2,}\/$/.test(currentURL)) {
+    setCurrentTab("people")
+}
+// Check if a LinkedIn company link is open
+if (/^https:\/\/www\.linkedin\.com\/company\/[^\/]{2,}\/$/.test(currentURL)) {
+   setCurrentTab("company")
+}
+})
 
 // This listener triggers when any tab is updated.
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -161,14 +173,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (/^https:\/\/www\.linkedin\.com\/in\/[^\/]{2,}\/$/.test(tab.url)) {
       setCurrentTab("people")
   }
-  
   // Check if a LinkedIn company link is open
   if (/^https:\/\/www\.linkedin\.com\/company\/[^\/]{2,}\/$/.test(tab.url)) {
      setCurrentTab("company")
   }
   }
 });
-
 
 
 
@@ -568,14 +578,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       {loading && <img src="/loading.gif" className="loading" />}
       {!loading && (
         <form action="" method="post">
+
+        <p style={{ display: 'flex', justifyContent: 'center' }}>{currentTab} mode</p>
+
           <div className="stats">
             <b>Total: {stats.total}</b>
             <b>Relevant: {stats.relevant}</b>
             <b>Not relevant: {stats.unrelevant}</b>
           </div>
           <div className="tabs" style={{ display: 'flex', justifyContent: 'center' }}>
-            <button type="button" onClick={() => handleTabClick('people')} style={{ marginRight: '20px' }}>People</button>
-            <button type="button" onClick={() => handleTabClick('company')}>Company</button>
           </div>
           {currentTab === 'people' && (
             <>
@@ -827,11 +838,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           {currentTab === 'company' && (
             <>
               <div className="btn">
-                <button type="button" onClick={scrape} disabled={!rules.length}>Scrape2</button>
+                <button type="button" onClick={scrape} disabled={!rules.length}>Scrape</button>
               </div>
               <div className="btns">
-                <button type="button" onClick={() => handleNextBack('back')} disabled={!back}>Back2</button>
-                <button type="button" onClick={() => handleNextBack('next')} disabled={!next}>Next2</button>
+                <button type="button" onClick={() => handleNextBack('back')} disabled={!back}>Back</button>
+                <button type="button" onClick={() => handleNextBack('next')} disabled={!next}>Next</button>
               </div>
               <label htmlFor="owner">Owner:</label>
               <input
