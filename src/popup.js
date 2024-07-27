@@ -150,7 +150,7 @@ const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getIte
     } else {
       setLoading(false);
     }
-  }, [owner]);
+  }, [owner, currentTab]); // rerun the findLinks function if the tab is also changed
 
   // Function that will find current candidate in the spradsheet and check that the candidate is not already processed also function returns links to the next and previous unprocessed profile in the spreadsheet and relevant jobs (rules) for sourcing for the given sourcer (user)
   const findBackNextLinks = () => {
@@ -171,8 +171,14 @@ const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getIte
         },
         async (res) => {
           const currentName = await normalize(res[0].result);
+          console.log("name")
+          console.log(currentName)
           // Constructs a request URL to the backend with appropriate query parameters, so backend will verify owner and find current candidate in the Google Spreadsheet
-          const linkReq = `${backendLink}/api?name=${currentName}&owner=${owner}&link=${currentURL}`;
+          console.log("currentTab:")
+          console.log(currentTab)
+          console.log("currentURL")
+          console.log(currentURL)
+          const linkReq = `${backendLink}/api?name=${currentName}&owner=${owner}&link=${currentURL}&mode=${currentTab}`;
           axios
             .get(linkReq)
             .then((res) => {
@@ -192,11 +198,15 @@ const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getIte
               }
             })
             .catch((err) => {
+              console.log("responce error:")
               console.log(err);
               // Handle any specific error response and create an error message accordingly.
               // The error message can be copied to the clipboard if user accepts the prompt.
               if (err.response.data && err.response.data.error) {
+                console.log("responce error2:")
+                console.log(err);
                 if (
+                  
                   confirm(
                     'Something went wrong :(\nPlease check if this candidate has the correct name in the table!\nIf the name is correct but the error remains, press "OK" to copy the error message and paste it to Slack.'
                   )
@@ -211,6 +221,8 @@ const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getIte
                   )
                 ) {
                   const error = `Url: ${currentURL}\nName: ${currentName}\nError message: ${err.message}\nError code: ${err.code}\n`;
+                  console.log("error")
+                  console.log(error)
                   setErrorMessage(error);
                 }
               }

@@ -12,8 +12,8 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // The action is performed only when the tab update status is 'complete' and the tab is active.
   if (changeInfo.status == "complete" && tab.active) {
-    // Checks if the URL of the tab matches the LinkedIn profile URL pattern.
-    if (/^https:\/\/www\.linkedin\.com\/in\/[^\/]{2,}\/$/.test(tab.url)) {
+    // Checks if the URL of the tab matches the LinkedIn profile or company URL pattern.
+    if (/^https:\/\/www\.linkedin\.com\/(in\/[^\/]{2,}|company\/[^\/]{2,})\/$/.test(tab.url)) {
       // Sends a message to the tab to open a modal window of the extension (main UI on the right side)
       chrome.tabs.sendMessage(tabId, { type: "openModal" });
       // This listener triggers when a message is received from the runtime.

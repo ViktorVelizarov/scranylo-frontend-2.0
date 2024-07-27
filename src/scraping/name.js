@@ -7,6 +7,9 @@ export function getCurrentName() {
     fullName.splice(1, 1);
     fullName = fullName.map((e) => e.trim());
     name = fullName.join(" ");
+    
   }
+  console.log("name from func")
+    console.log(name)
   return name;
 }
