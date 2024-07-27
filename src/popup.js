@@ -152,6 +152,26 @@ const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getIte
     }
   }, [owner, currentTab]); // rerun the findLinks function if the tab is also changed
 
+
+// This listener triggers when any tab is updated.
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // The action is performed only when the tab update status is 'complete' and the tab is active.
+  if (changeInfo.status == "complete" && tab.active) {
+    // Checks if the URL of the tab matches the LinkedIn profile.
+    if (/^https:\/\/www\.linkedin\.com\/in\/[^\/]{2,}\/$/.test(tab.url)) {
+      setCurrentTab("people")
+  }
+  
+  // Check if a LinkedIn company link is open
+  if (/^https:\/\/www\.linkedin\.com\/company\/[^\/]{2,}\/$/.test(tab.url)) {
+     setCurrentTab("company")
+  }
+  }
+});
+
+
+
+
   // Function that will find current candidate in the spradsheet and check that the candidate is not already processed also function returns links to the next and previous unprocessed profile in the spreadsheet and relevant jobs (rules) for sourcing for the given sourcer (user)
   const findBackNextLinks = () => {
     // turn on loading animation
@@ -554,7 +574,7 @@ const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getIte
             <b>Not relevant: {stats.unrelevant}</b>
           </div>
           <div className="tabs" style={{ display: 'flex', justifyContent: 'center' }}>
-            <button type="button" onClick={() => handleTabClick('people')} style={{ marginRight: '10px' }}>People</button>
+            <button type="button" onClick={() => handleTabClick('people')} style={{ marginRight: '20px' }}>People</button>
             <button type="button" onClick={() => handleTabClick('company')}>Company</button>
           </div>
           {currentTab === 'people' && (
