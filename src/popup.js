@@ -6,6 +6,8 @@ import axios from "axios";
 import { normalize } from "normalize-diacritics";
 import Select from "react-select";
 import { getInfo } from "./scraping/basicInfo";
+import { getCompanyOverviewInitial } from "./scraping/CompanyOverview";
+import { getCompanyOverviewAfterNavigation } from "./scraping/getCompanyOverviewAfterNavigation";
 import { getCurrent } from "./scraping/currentJob";
 import { getUniversity } from "./scraping/university";
 import { getSkills } from "./scraping/skills";
@@ -313,6 +315,177 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     setCurrentTab(tab);
   };
 
+   
+
+
+  const scrape2 = async (event) => {
+    // Prevent the default submission of a form
+    event.preventDefault();
+  
+    // If there are no rules defined, exit the function.
+    if (!rules.length) {
+      return;
+    }
+  
+    let tabId = "";
+    let currentSkills = [];
+    let allSkills = [];
+  
+    try {
+      // Query the active tab in the current window
+      const tabs = await new Promise((resolve, reject) => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(tabs);
+          }
+        });
+      });
+  
+      const url = tabs[0].url;
+      tabId = tabs[0].id;
+      setUrl(url);
+      localStorage.setItem("url", url);
+  
+      // Helper function to wrap chrome.scripting.executeScript in a Promise
+      const executeScript = (func, args = []) => {
+        return new Promise((resolve, reject) => {
+          chrome.scripting.executeScript(
+            {
+              target: { tabId: tabId },
+              func: func,
+              args: args,
+            },
+            (res) => {
+              if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+              } else {
+                resolve(res);
+              }
+            }
+          );
+        });
+      };
+  
+      // Scrape initial company overview and initiate navigation
+      let res = await executeScript(getCompanyOverviewInitial, [currentRule.skillsRegex, allSkillsRegex]);
+      console.log("res from scrape initial:");
+      console.log(res);
+  
+      let name = await normalize(res[0].result.name);
+      setName(name);
+      localStorage.setItem("name", name);
+  
+      // Wait for navigation to complete
+      await new Promise(resolve => setTimeout(resolve, 2000));
+  
+      // Scrape additional company information after navigation
+      res = await executeScript(getCompanyOverviewAfterNavigation);
+      console.log("res from scrape after navigation:");
+      console.log(res);
+  
+      setConnections(res[0].result.connections);
+      localStorage.setItem("connections", res[0].result.connections);
+  
+      currentSkills = res[0].result.skills && res[0].result.skills.length ? res[0].result.skills : [];
+      allSkills = res[0].result.allSkills && res[0].result.allSkills.length ? res[0].result.allSkills : [];
+  
+      // Scrape current position
+      res = await executeScript(getCurrent);
+      setCurrentPosition(res[0].result.position);
+      localStorage.setItem("currentPosition", res[0].result.position);
+      setCurrentCompany(res[0].result.company);
+      localStorage.setItem("currentCompany", res[0].result.company);
+      setYearInCurrent((res[0].result.days / 365).toFixed(1));
+      localStorage.setItem("yearInCurrent", (res[0].result.days / 365).toFixed(1));
+  
+      if (typeof res[0].result.type === "object") {
+        res[0].result.type = res[0].result.type[0];
+      }
+      setCurrentType(res[0].result.type);
+      localStorage.setItem("currentType", res[0].result.type);
+  
+      // Scrape university
+      res = await executeScript(getUniversity, [currentRule.universitiesRegex]);
+      setUniversity(res[0].result);
+      localStorage.setItem("university", JSON.stringify(res[0].result));
+  
+      // Scrape experience
+      res = await executeScript(getExp, [currentRule.skillsRegex, allSkillsRegex]);
+      setExperience((res[0].result.workDays / 365).toFixed(1));
+      localStorage.setItem("experience", (res[0].result.workDays / 365).toFixed(1));
+  
+      if (res[0].result.skills) {
+        currentSkills = currentSkills.concat(res[0].result.skills);
+      }
+      if (res[0].result.allSkills) {
+        allSkills = allSkills.concat(res[0].result.allSkills);
+      } else {
+        console.log("there are no skills in the experience section");
+      }
+  
+      // Scrape additional skills
+      res = await executeScript(getSkills, [currentRule.skillsRegex, allSkillsRegex]);
+      if (res[0].result.relevantSkills) {
+        currentSkills = currentSkills.concat(res[0].result.relevantSkills);
+      }
+  
+      // Create array of unique skills (relevant for current job) that will be case insensitive
+      let uniqueRelevantSkills = currentSkills
+        .filter((item, index) => {
+          const lower = item.toLowerCase();
+          const firstIndex = currentSkills.findIndex(
+            (skill) => skill.toLowerCase() === lower
+          );
+          return index === firstIndex;
+        })
+        .join(", ");
+      if (!uniqueRelevantSkills) {
+        uniqueRelevantSkills = "";
+      }
+  
+      if (res[0].result.allSkills) {
+        allSkills = allSkills.concat(res[0].result.allSkills);
+      }
+  
+      // Create array of unique "all skills" (generally relevant) that will be case insensitive
+      let uniqueAllSkills = allSkills
+        .filter((item, index) => {
+          const lower = item.toLowerCase();
+          const firstIndex = allSkills.findIndex(
+            (skill) => skill.toLowerCase() === lower
+          );
+          return index === firstIndex;
+        })
+        .join(", ");
+      if (!uniqueAllSkills) {
+        uniqueAllSkills = "";
+      }
+  
+      localStorage.setItem("skills", uniqueRelevantSkills);
+      setSkills(uniqueRelevantSkills);
+      localStorage.setItem("all-skills", uniqueAllSkills);
+      setAllSkills(uniqueAllSkills);
+    } catch (error) {
+      console.error("Error during scraping:", error);
+    }
+  
+    // By default candidate is not relevant (only the sourcer determines the relevance of the candidate)
+    setRelevant({ label: "No", value: "No" });
+    localStorage.setItem("relevant", JSON.stringify({ label: "No", value: "No" }));
+    // Remove previous reachout comment and set reachout topic to default value
+    setReachoutComment("");
+    setReachoutTopic({ label: "Other", value: "Other" });
+  };
+  
+
+
+
+
+
+
+  
   // This function is responsible for scraping candidate's information from the active LinkedIn profile, it runs all functions from the /scraping directory (except getCurrentName())
   const scrape = (event) => {
     // Prevent the default submission of a form
@@ -336,11 +509,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           target: {
             tabId: tabId,
           },
-          func: getInfo,
+          func: getCompanyOverviewInitial ,
           args: [currentRule.skillsRegex, allSkillsRegex],
         },
         // Normalize scraped data and save them to the state and local storage
         async (res) => {
+          console.log("res from scrape:")
+          console.log(res)
+          
           res[0].result.name = await normalize(res[0].result.name);
           setName(res[0].result.name);
           localStorage.setItem("name", res[0].result.name);
@@ -470,6 +646,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         }
       );
     });
+
+
+
+    
     // By default candidate is not relevant (only the sourcer determines the relevance of the candidate)
     setRelevant({ label: "No", value: "No" });
     localStorage.setItem(
@@ -838,7 +1018,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           {currentTab === 'company' && (
             <>
               <div className="btn">
-                <button type="button" onClick={scrape} disabled={!rules.length}>Scrape</button>
+                <button type="button" onClick={scrape2} disabled={!rules.length}>Scrape</button>
               </div>
               <div className="btns">
                 <button type="button" onClick={() => handleNextBack('back')} disabled={!back}>Back</button>
