@@ -372,7 +372,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       console.log(res);
   
       let name = await normalize(res[0].result.name);
+      let followers = await normalize(res[0].result.followers);
       setName(name);
+      setFollowers(followers);
       localStorage.setItem("name", name);
   
       // Wait for navigation to complete
