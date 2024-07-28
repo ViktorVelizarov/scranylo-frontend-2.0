@@ -115,8 +115,6 @@ const [post3Text, setPost3Text] = useState(localStorage.getItem('post3Text') || 
 const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getItem('recentlyPostedJobs') || '');
 
 
-
-
   // regex for skills relevant for our database (all jobs)
   const [allSkillsRegex, setAllSkillsRegex] = useState("");
   // options for select inputs: "Status", "Relevant", "Reach out topic"
@@ -391,6 +389,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
       setWebsite(res[0].result.website);
       localStorage.setItem("company-website", res[0].result.website);
+
+      setSpecialities(res[0].result.specialties);
+      localStorage.setItem("company-specialities", res[0].result.specialties);
+      
+      setHq(res[0].result.headquarters);
+      localStorage.setItem("company-headquarters", res[0].result.headquarters);
 
       setIndustry(res[0].result.industry);
       localStorage.setItem("company-industry", res[0].result.industry);

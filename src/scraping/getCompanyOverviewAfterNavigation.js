@@ -27,6 +27,16 @@ export function getCompanyOverviewAfterNavigation() {
         info["website"] = websiteElement.nextElementSibling.querySelector('a').innerText;
     }
 
+    const HQElement = getElementByText('dt', 'Headquarters');
+    if (HQElement) {
+        info["headquarters"] = HQElement.nextElementSibling.innerText;
+    }
+
+    const SpecialtiesElement = getElementByText('dt', 'Specialties');
+    if (SpecialtiesElement) {
+        info["specialties"] = SpecialtiesElement.nextElementSibling.innerText;
+    }
+
     const industryElement = getElementByText('dt', 'Industry');
     if (industryElement) {
         info["industry"] = industryElement.nextElementSibling.innerText;
