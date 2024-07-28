@@ -385,95 +385,33 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       console.log("res from scrape after navigation:");
       console.log(res);
   
-      setConnections(res[0].result.connections);
-      localStorage.setItem("connections", res[0].result.connections);
+      
+      setDescription(res[0].result.getCompanyOverview);
+      localStorage.setItem("company-description", res[0].result.getCompanyOverview);
+
+      setWebsite(res[0].result.website);
+      localStorage.setItem("company-website", res[0].result.website);
+
+      setIndustry(res[0].result.industry);
+      localStorage.setItem("company-industry", res[0].result.industry);
+
+      setCompanySize(res[0].result.companySize);
+      localStorage.setItem("company-size", res[0].result.companySize);
   
       currentSkills = res[0].result.skills && res[0].result.skills.length ? res[0].result.skills : [];
       allSkills = res[0].result.allSkills && res[0].result.allSkills.length ? res[0].result.allSkills : [];
   
-      // Scrape current position
-      res = await executeScript(getCurrent);
-      setCurrentPosition(res[0].result.position);
-      localStorage.setItem("currentPosition", res[0].result.position);
-      setCurrentCompany(res[0].result.company);
-      localStorage.setItem("currentCompany", res[0].result.company);
-      setYearInCurrent((res[0].result.days / 365).toFixed(1));
-      localStorage.setItem("yearInCurrent", (res[0].result.days / 365).toFixed(1));
-  
-      if (typeof res[0].result.type === "object") {
-        res[0].result.type = res[0].result.type[0];
-      }
-      setCurrentType(res[0].result.type);
-      localStorage.setItem("currentType", res[0].result.type);
-  
-      // Scrape university
-      res = await executeScript(getUniversity, [currentRule.universitiesRegex]);
-      setUniversity(res[0].result);
-      localStorage.setItem("university", JSON.stringify(res[0].result));
-  
-      // Scrape experience
-      res = await executeScript(getExp, [currentRule.skillsRegex, allSkillsRegex]);
-      setExperience((res[0].result.workDays / 365).toFixed(1));
-      localStorage.setItem("experience", (res[0].result.workDays / 365).toFixed(1));
-  
-      if (res[0].result.skills) {
-        currentSkills = currentSkills.concat(res[0].result.skills);
-      }
-      if (res[0].result.allSkills) {
-        allSkills = allSkills.concat(res[0].result.allSkills);
-      } else {
-        console.log("there are no skills in the experience section");
-      }
   
       // Scrape additional skills
       res = await executeScript(getSkills, [currentRule.skillsRegex, allSkillsRegex]);
       if (res[0].result.relevantSkills) {
         currentSkills = currentSkills.concat(res[0].result.relevantSkills);
       }
-  
-      // Create array of unique skills (relevant for current job) that will be case insensitive
-      let uniqueRelevantSkills = currentSkills
-        .filter((item, index) => {
-          const lower = item.toLowerCase();
-          const firstIndex = currentSkills.findIndex(
-            (skill) => skill.toLowerCase() === lower
-          );
-          return index === firstIndex;
-        })
-        .join(", ");
-      if (!uniqueRelevantSkills) {
-        uniqueRelevantSkills = "";
-      }
-  
-      if (res[0].result.allSkills) {
-        allSkills = allSkills.concat(res[0].result.allSkills);
-      }
-  
-      // Create array of unique "all skills" (generally relevant) that will be case insensitive
-      let uniqueAllSkills = allSkills
-        .filter((item, index) => {
-          const lower = item.toLowerCase();
-          const firstIndex = allSkills.findIndex(
-            (skill) => skill.toLowerCase() === lower
-          );
-          return index === firstIndex;
-        })
-        .join(", ");
-      if (!uniqueAllSkills) {
-        uniqueAllSkills = "";
-      }
-  
-      localStorage.setItem("skills", uniqueRelevantSkills);
-      setSkills(uniqueRelevantSkills);
-      localStorage.setItem("all-skills", uniqueAllSkills);
-      setAllSkills(uniqueAllSkills);
+
     } catch (error) {
       console.error("Error during scraping:", error);
     }
-  
-    // By default candidate is not relevant (only the sourcer determines the relevance of the candidate)
-    setRelevant({ label: "No", value: "No" });
-    localStorage.setItem("relevant", JSON.stringify({ label: "No", value: "No" }));
+
     // Remove previous reachout comment and set reachout topic to default value
     setReachoutComment("");
     setReachoutTopic({ label: "Other", value: "Other" });
