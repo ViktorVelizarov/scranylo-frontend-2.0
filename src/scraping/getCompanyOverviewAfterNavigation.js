@@ -1,7 +1,7 @@
 export function getCompanyOverviewAfterNavigation() {
-    // Log the entire HTML document to the console
-    console.log("whole html: ")
-    console.log(document.documentElement.outerHTML);
+    // // Log the entire HTML document to the console
+    // console.log("whole html: ")
+    // console.log(document.documentElement.outerHTML);
 
     let info = {};
 

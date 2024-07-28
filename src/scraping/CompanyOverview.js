@@ -47,13 +47,38 @@ export function getCompanyOverviewInitial(skillsRegex, allSkillsRegex) {
     console.log("Median tenure element not found.");
   }
   
-  // Navigate to the company "About" page
-  let aboutLink = document.querySelector('a[href*="/about/"]');
-  console.log("about link:");
-  console.log(aboutLink);
-  if (aboutLink) {
-    aboutLink.click();
-  }
+    // Navigate to the company "About" page
+    let aboutLink = document.querySelector('a[href*="/about/"]');
+    console.log("about link:");
+    console.log(aboutLink);
+    if (aboutLink) {
+      aboutLink.click();
+  
+      // Wait for the "About" page to load
+      let observer = new MutationObserver((mutations, observer) => {
+        // Check for a specific element that only exists on the "About" page
+        let aboutPageLoaded = document.querySelector('h2.text-heading-xlarge');
+        if (aboutPageLoaded && aboutPageLoaded.innerText.includes("Overview")) {
+          observer.disconnect(); // Stop observing
+          console.log("About page loaded");
+  
+          // Wait for seconds after the "About" page has loaded
+          setTimeout(() => {
+            // Navigate to the company "Jobs" page
+            let jobsLink = document.querySelector('a[href*="/jobs/"]');
+            console.log("jobs link:");
+            console.log(jobsLink);
+            if (jobsLink) {
+              jobsLink.click();
+            }
+          }, 1800);
+        }
+      });
+  
+      // Start observing the document for changes
+      observer.observe(document, { childList: true, subtree: true });
+    }
+  
 
   return info;
 }

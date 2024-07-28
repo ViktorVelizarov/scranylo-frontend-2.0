@@ -410,8 +410,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   
       currentSkills = res[0].result.skills && res[0].result.skills.length ? res[0].result.skills : [];
       allSkills = res[0].result.allSkills && res[0].result.allSkills.length ? res[0].result.allSkills : [];
-  
-  
+
+
+
       // Scrape additional skills
       res = await executeScript(getSkills, [currentRule.skillsRegex, allSkillsRegex]);
       if (res[0].result.relevantSkills) {
