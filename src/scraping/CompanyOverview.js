@@ -29,6 +29,23 @@ export function getCompanyOverviewInitial(skillsRegex, allSkillsRegex) {
   } else {
     console.log("Name element not found.");
   }
+
+  // Extracting the percentage of total headcount growth
+  let headcountGrowthElement = document.querySelector(".org-home-premium-insights-module__content-card .text-display-small");
+  if (headcountGrowthElement) {
+    info["headcountGrowth"] = headcountGrowthElement.innerText.trim();
+  } else {
+    console.log("Headcount growth element not found.");
+  }
+
+  // Extracting the duration of median tenure
+  let medianTenureElement = Array.from(document.querySelectorAll(".org-home-premium-insights-module__content-card .text-display-small"))
+    .find(element => element.innerText.includes("years"));
+  if (medianTenureElement) {
+    info["medianTenure"] = medianTenureElement.innerText.trim();
+  } else {
+    console.log("Median tenure element not found.");
+  }
   
   // Navigate to the company "About" page
   let aboutLink = document.querySelector('a[href*="/about/"]');

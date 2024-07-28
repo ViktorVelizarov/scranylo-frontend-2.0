@@ -373,8 +373,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   
       let name = await normalize(res[0].result.name);
       let followers = await normalize(res[0].result.followers);
+      let totalHeadcount = await normalize(res[0].result.headcountGrowth);
+      let medianTenure = await normalize(res[0].result.medianTenure);
       setName(name);
       setFollowers(followers);
+      setTotalHeadcount(totalHeadcount)
+      setMedianTenure(medianTenure)
       localStorage.setItem("name", name);
   
       // Wait for navigation to complete
