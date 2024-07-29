@@ -46,14 +46,37 @@ export function getCompanyOverviewInitial(skillsRegex, allSkillsRegex) {
   } else {
     console.log("Median tenure element not found.");
   }
-  
-    // Navigate to the company "About" page
+
+  // Function to recursively get text content
+  function getTextContent(element) {
+    return Array.from(element.childNodes).map(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent.trim();
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        return getTextContent(node);
+      }
+      return "";
+    }).join(" ");
+  }
+
+  // Function to click the "Next" button
+  function clickNextButton() {
+    let nextButton = document.querySelector('button.artdeco-pagination__button--next');
+    if (nextButton) {
+      nextButton.click();
+      console.log("Clicked Next button");
+    }
+  }
+
+
+
+  function navigateToAboutPage() {
     let aboutLink = document.querySelector('a[href*="/about/"]');
     console.log("about link:");
     console.log(aboutLink);
     if (aboutLink) {
       aboutLink.click();
-  
+
       // Wait for the "About" page to load
       let observer = new MutationObserver((mutations, observer) => {
         // Check for a specific element that only exists on the "About" page
@@ -61,7 +84,7 @@ export function getCompanyOverviewInitial(skillsRegex, allSkillsRegex) {
         if (aboutPageLoaded && aboutPageLoaded.innerText.includes("Overview")) {
           observer.disconnect(); // Stop observing
           console.log("About page loaded");
-  
+
           // Wait for seconds after the "About" page has loaded
           setTimeout(() => {
             // Navigate to the company "Jobs" page
@@ -74,11 +97,47 @@ export function getCompanyOverviewInitial(skillsRegex, allSkillsRegex) {
           }, 1800);
         }
       });
-  
+
       // Start observing the document for changes
       observer.observe(document, { childList: true, subtree: true });
     }
-  
+  }
+  let postContents = [];
+  function ScrapePost(){
+ // Scrape the first post from the specified <ul> element
+ 
+ let posts = document.querySelectorAll('ul.artdeco-carousel__slider li');
+ for (let i = 0; i < 3 && i < posts.length; i++) {
+   let postContentElement = posts[i].querySelector('span.break-words span[dir="ltr"]');
+   if (postContentElement) {
+     // Collect text from the post, including nested spans
+     let postText = getTextContent(postContentElement);
+     postContents.push(postText);
+   }
+ }
+  }
+
+  ScrapePost()
+  clickNextButton()
+  ScrapePost()
+  clickNextButton()
+  ScrapePost()
+  clickNextButton()
+  ScrapePost()
+
+  // Using a Set to remove duplicates
+let uniquePostContents = [...new Set(postContents)];
+console.log("uniquePostContents");
+console.log(uniquePostContents);
+info["post1"] = uniquePostContents[0]
+info["post2"] = uniquePostContents[1]
+info["post3"] = uniquePostContents[2]
+
+console.log("info2")
+console.log(info)
+  // Proceed with navigating to the company "About" page
+navigateToAboutPage();
+
 
   return info;
 }

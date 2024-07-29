@@ -375,11 +375,24 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       let followers = await normalize(res[0].result.followers);
       let totalHeadcount = await normalize(res[0].result.headcountGrowth);
       let medianTenure = await normalize(res[0].result.medianTenure);
+      let post1text = await normalize(res[0].result.post1);
+      let post2text = await normalize(res[0].result.post2);
+      let post3text = await normalize(res[0].result.post3);
+
       setName(name);
+      localStorage.setItem("company-name", name);
       setFollowers(followers);
+      localStorage.setItem("company-followers", followers);
       setTotalHeadcount(totalHeadcount)
+      localStorage.setItem("company-totalHeadcount", totalHeadcount);
       setMedianTenure(medianTenure)
-      localStorage.setItem("name", name);
+      localStorage.setItem("company-medianTenure", medianTenure);
+      setPost1Text(post1text)
+      localStorage.setItem("company-post1text", post1text);
+      setPost2Text(post2text)
+      localStorage.setItem("company-post2text", post2text);
+      setPost3Text(post3text)
+      localStorage.setItem("company-post3text", post3text);
   
       // Wait for navigation to complete
       await new Promise(resolve => setTimeout(resolve, 2000));
