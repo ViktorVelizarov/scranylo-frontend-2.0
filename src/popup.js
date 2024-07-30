@@ -7,7 +7,6 @@ import { normalize } from "normalize-diacritics";
 import Select from "react-select";
 import { getInfo } from "./scraping/basicInfo";
 import { getCompanyOverviewInitial } from "./scraping/CompanyOverview";
-import { getCompanyOverviewAfterNavigation } from "./scraping/getCompanyOverviewAfterNavigation";
 import { getCurrent } from "./scraping/currentJob";
 import { getUniversity } from "./scraping/university";
 import { getSkills } from "./scraping/skills";
@@ -97,22 +96,22 @@ function Popup() {
   const [currentTab, setCurrentTab] = useState('people');
 
 //states for the company form
-const [followers, setFollowers] = useState(localStorage.getItem('followers') || '');
-const [description, setDescription] = useState(localStorage.getItem('description') || '');
-const [website, setWebsite] = useState(localStorage.getItem('website') || '');
-const [industry, setIndustry] = useState(localStorage.getItem('industry') || '');
-const [companySize, setCompanySize] = useState(localStorage.getItem('companySize') || '');
-const [totalHeadcount, setTotalHeadcount] = useState(localStorage.getItem('totalHeadcount') || '');
-const [medianTenure, setMedianTenure] = useState(localStorage.getItem('medianTenure') || '');
-const [hq, setHq] = useState(localStorage.getItem('hq') || '');
-const [specialities, setSpecialities] = useState(localStorage.getItem('specialities') || '');
-const [post1Url, setPost1Url] = useState(localStorage.getItem('post1Url') || '');
-const [post1Text, setPost1Text] = useState(localStorage.getItem('post1Text') || '');
-const [post2Url, setPost2Url] = useState(localStorage.getItem('post2Url') || '');
-const [post2Text, setPost2Text] = useState(localStorage.getItem('post2Text') || '');
-const [post3Url, setPost3Url] = useState(localStorage.getItem('post3Url') || '');
-const [post3Text, setPost3Text] = useState(localStorage.getItem('post3Text') || '');
-const [recentlyPostedJobs, setRecentlyPostedJobs] = useState(localStorage.getItem('recentlyPostedJobs') || '');
+const [followers, setFollowers] = useState(localStorage.getItem('company-followers') || '');
+const [description, setDescription] = useState(localStorage.getItem('company-description') || '');
+const [website, setWebsite] = useState(localStorage.getItem('company-website') || '');
+const [industry, setIndustry] = useState(localStorage.getItem('company-industry') || '');
+const [companySize, setCompanySize] = useState(localStorage.getItem('company-companySize') || '');
+const [totalHeadcount, setTotalHeadcount] = useState(localStorage.getItem('company-totalHeadcount') || '');
+const [medianTenure, setMedianTenure] = useState(localStorage.getItem('company-medianTenure') || '');
+const [hq, setHq] = useState(localStorage.getItem('company-hq') || '');
+const [specialities, setSpecialities] = useState(localStorage.getItem('company-specialities') || '');
+const [post1Text, setPost1Text] = useState(localStorage.getItem('company-post1Text') || '');
+const [post2Text, setPost2Text] = useState(localStorage.getItem('company-post2Text') || '');
+const [post3Text, setPost3Text] = useState(localStorage.getItem('company-post3Text') || '');
+const [job1Title, setJob1Title] = useState(localStorage.getItem('company-job1Title') || '');
+const [job2Title, setJob2Title] = useState(localStorage.getItem('company-job2Title') || '');
+const [job1URL, setJob1URL] = useState(localStorage.getItem('company-job1URL') || '');
+const [job2URL, setJob2URL] = useState(localStorage.getItem('company-job2URL') || '');
 
 
   // regex for skills relevant for our database (all jobs)
@@ -366,65 +365,81 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         });
       };
   
-      // Scrape initial company overview and initiate navigation
-      let res = await executeScript(getCompanyOverviewInitial, [currentRule.skillsRegex, allSkillsRegex]);
-      console.log("res from scrape initial:");
-      console.log(res);
-  
-      let name = await normalize(res[0].result.name);
-      let followers = await normalize(res[0].result.followers);
-      let totalHeadcount = await normalize(res[0].result.headcountGrowth);
-      let medianTenure = await normalize(res[0].result.medianTenure);
-      let post1text = await normalize(res[0].result.post1);
-      let post2text = await normalize(res[0].result.post2);
-      let post3text = await normalize(res[0].result.post3);
+      try {
+        // Scrape initial company overview and initiate navigation
+        let res = await executeScript(getCompanyOverviewInitial, [currentRule.skillsRegex, allSkillsRegex]);
+        console.log("res from scrape initial:", res);
+        
+        if (res && res[0] && res[0].result) {
+          let result = res[0].result;
+          console.log("result from scrape initial:", result);
+          // console.log("scrap_name")
+          // console.log(result.name)
+          // let scraped_name = await normalize(result.name);
+          // console.log(scraped_name)
+          // setName(scraped_name);
+          // setIndustry(result.industry)
+          // let scraped_followers = await normalize(result.followers);
+          // let totalHeadcount = await normalize(result.headcountGrowth);
+          // let medianTenure = await normalize(result.medianTenure);
+          // let post1text = await normalize(result.post1);
+          // let post2text = await normalize(result.post2);
+          // let post3text = await normalize(result.post3);
+          // let job1titletext = await normalize(result.jobTitle1);
+          // let job2titletext = await normalize(result.jobTitle2);
+          // let job1URLtext = await normalize(result.jobURL1);
+          // let job2URLtext = await normalize(result.jobURL2);
+          // // let industrytext = await normalize(result.industry);
+          // console.log("industry: ")
+          // console.log(result.industry)
+          // console.log(result.medianTenure)
 
-      setName(name);
-      localStorage.setItem("company-name", name);
-      setFollowers(followers);
-      localStorage.setItem("company-followers", followers);
-      setTotalHeadcount(totalHeadcount)
-      localStorage.setItem("company-totalHeadcount", totalHeadcount);
-      setMedianTenure(medianTenure)
-      localStorage.setItem("company-medianTenure", medianTenure);
-      setPost1Text(post1text)
-      localStorage.setItem("company-post1text", post1text);
-      setPost2Text(post2text)
-      localStorage.setItem("company-post2text", post2text);
-      setPost3Text(post3text)
-      localStorage.setItem("company-post3text", post3text);
-  
-      // Wait for navigation to complete
-      await new Promise(resolve => setTimeout(resolve, 2000));
-  
-      // Scrape additional company information after navigation
-      res = await executeScript(getCompanyOverviewAfterNavigation);
-      console.log("res from scrape after navigation:");
-      console.log(res);
-  
-      
-      setDescription(res[0].result.getCompanyOverview);
-      localStorage.setItem("company-description", res[0].result.getCompanyOverview);
+          // setIndustry(industrytext);
+          // localStorage.setItem("company-industry", industrytext);
 
-      setWebsite(res[0].result.website);
-      localStorage.setItem("company-website", res[0].result.website);
+          setDescription(result.getCompanyOverview)
+          setCompanySize(result.companySize)
+          setIndustry(result.industry)
+          setWebsite(result.website)
+          setHq(result.headquarters)
+          setSpecialities(result.specialties)
+          // setSpecialities(results.specialities)
 
-      setSpecialities(res[0].result.specialties);
-      localStorage.setItem("company-specialities", res[0].result.specialties);
-      
-      setHq(res[0].result.headquarters);
-      localStorage.setItem("company-headquarters", res[0].result.headquarters);
+          setName(result.name);
+          // localStorage.setItem("company-name", scraped_name);
+          setFollowers(result.followers);
+          // localStorage.setItem("company-followers", scraped_followers);
+          setTotalHeadcount(result.headcountGrowth);
+          // localStorage.setItem("company-totalHeadcount", totalHeadcount);
+          setMedianTenure(result.medianTenure);
+          // localStorage.setItem("company-medianTenure", medianTenure);
+          setPost1Text(result.post1);
+          // localStorage.setItem("company-post1text", post1text);
+          setPost2Text(result.post2);
+          // localStorage.setItem("company-post2text", post2text);
+          setPost3Text(result.post3);
+          // localStorage.setItem("company-post3text", post3text);
+          setJob1Title(result.jobTitle1);
+          // localStorage.setItem("company-job1Title", job1titletext);
+          setJob2Title(result.jobTitle2);
+          // localStorage.setItem("company-job2Title", job2titletext);
+          setJob1URL(result.jobURL1);
+          // localStorage.setItem("company-job1URL", job1URLtext);
+          setJob2URL(result.jobURL2);
+          // localStorage.setItem("company-job2URL", job2URLtext);
 
-      setIndustry(res[0].result.industry);
-      localStorage.setItem("company-industry", res[0].result.industry);
+        } else {
+          console.error("Failed to get the expected result structure from executeScript");
+        }
 
-      setCompanySize(res[0].result.companySize);
-      localStorage.setItem("company-size", res[0].result.companySize);
+      } catch (error) {
+        console.error("Error during scraping:", error);
+      }
   
+
+
       currentSkills = res[0].result.skills && res[0].result.skills.length ? res[0].result.skills : [];
       allSkills = res[0].result.allSkills && res[0].result.allSkills.length ? res[0].result.allSkills : [];
-
-
 
       // Scrape additional skills
       res = await executeScript(getSkills, [currentRule.skillsRegex, allSkillsRegex]);
@@ -442,12 +457,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   };
   
 
-
-
-
-
-
-  
   // This function is responsible for scraping candidate's information from the active LinkedIn profile, it runs all functions from the /scraping directory (except getCurrentName())
   const scrape = (event) => {
     // Prevent the default submission of a form
@@ -641,6 +650,72 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         relevant: relevant.label,
         url: url,
         name: name,
+        connections: connections,
+        experience: experience,
+        currentPosition: currentPosition,
+        currentCompany: currentCompany,
+        yearInCurrent: yearInCurrent,
+        currentType: currentType,
+        university: university,
+        skills: prepareSkills(skills), //arrays of skills to the strings
+        allSkills: prepareSkills(allSkills),
+        reachoutTopic: reachoutTopic.label,
+        reachoutComment: reachoutComment,
+        sourcingJob: currentRule.title,
+      })
+      .then((res) => {
+        // On successful response from the server, update the sourcer's stats
+        setStats(res.data.stats);
+        // Send a success message to the extension runtime to show popup after upload
+        chrome.runtime.sendMessage(
+          {
+            data: {
+              subject: "succesfull_upload",
+              content: res.data.res,
+            },
+          },
+          (response) => {
+            return true;
+          }
+        );
+      })
+      .catch((err) => {
+        let apiResponse = "";
+        // Handle any errors that occur during the request (same process as in the findBackNextLinks() function)
+        if (err.response.data && err.response.data.error) {
+          apiResponse = `API response: ${err.response.data.error}`;
+        }
+        if (
+          confirm(
+            'Something went wrong :(\nPress "OK" if you want to copy the error message and then paste it to Slack. Or press "Cancel" to close alert popup.'
+          )
+        ) {
+          const error = `Url: ${url}\nName: ${name}\nError message: ${err.message}\nError code: ${err.code}\n${apiResponse}`;
+          setErrorMessage(error);
+        }
+      })
+      // remove loading animation after request
+      .finally(() => setLoading(false));
+  };
+
+
+  const sendData2 = async (event) => {
+    // start loading animation
+    setLoading(true);
+    // prevent form submition
+    event.preventDefault();
+    // if there is no owner setted, then finish upload
+    if (!owner) {
+      alert("Owner is empty");
+    }
+    // send POST request with data to the server
+    await axios
+      .post(`${backendLink}/api`, {
+        owner: owner,
+        name: name,
+        followers: followers,
+        description: description,
+        website: website,
         connections: connections,
         experience: experience,
         currentPosition: currentPosition,
@@ -1074,14 +1149,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 value={specialities}
                 onChange={(e) => { setSpecialities(e.target.value); localStorage.setItem('specialities', e.target.value); }}
               />
-              <label htmlFor="post1Url">Post 1 URL:</label>
-              <input
-                type="text"
-                id="post1Url"
-                name="post1Url"
-                value={post1Url}
-                onChange={(e) => { setPost1Url(e.target.value); localStorage.setItem('post1Url', e.target.value); }}
-              />
               <label htmlFor="post1Text">Post 1 Text:</label>
               <textarea
                 id="post1Text"
@@ -1089,14 +1156,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 value={post1Text}
                 onChange={(e) => { setPost1Text(e.target.value); localStorage.setItem('post1Text', e.target.value); }}
               ></textarea>
-              <label htmlFor="post2Url">Post 2 URL:</label>
-              <input
-                type="text"
-                id="post2Url"
-                name="post2Url"
-                value={post2Url}
-                onChange={(e) => { setPost2Url(e.target.value); localStorage.setItem('post2Url', e.target.value); }}
-              />
+             
               <label htmlFor="post2Text">Post 2 Text:</label>
               <textarea
                 id="post2Text"
@@ -1104,14 +1164,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 value={post2Text}
                 onChange={(e) => { setPost2Text(e.target.value); localStorage.setItem('post2Text', e.target.value); }}
               ></textarea>
-              <label htmlFor="post3Url">Post 3 URL:</label>
-              <input
-                type="text"
-                id="post3Url"
-                name="post3Url"
-                value={post3Url}
-                onChange={(e) => { setPost3Url(e.target.value); localStorage.setItem('post3Url', e.target.value); }}
-              />
+             
               <label htmlFor="post3Text">Post 3 Text:</label>
               <textarea
                 id="post3Text"
@@ -1119,14 +1172,49 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 value={post3Text}
                 onChange={(e) => { setPost3Text(e.target.value); localStorage.setItem('post3Text', e.target.value); }}
               ></textarea>
-              <label htmlFor="recentlyPostedJobs">Recently Posted Jobs:</label>
+
+<label htmlFor="job1Title">Job 1 Title:</label>
               <textarea
-                id="recentlyPostedJobs"
-                name="recentlyPostedJobs"
-                value={recentlyPostedJobs}
-                onChange={(e) => { setRecentlyPostedJobs(e.target.value); localStorage.setItem('recentlyPostedJobs', e.target.value); }}
+                id="job1Title"
+                name="job1Title"
+                value={job1Title}
+                onChange={(e) => { setJob1Title(e.target.value); localStorage.setItem('job1Title', e.target.value); }}
               ></textarea>
+
+<label htmlFor="job1URL">Job 1 URL:</label>
+              <textarea
+                id="job1URL"
+                name="job1URL"
+                value={job1URL}
+                onChange={(e) => { setJob1URL(e.target.value); localStorage.setItem('job1URL', e.target.value); }}
+              ></textarea>
+
+<label htmlFor="job2Title">Job 2 Title:</label>
+              <textarea
+                id="job2Title"
+                name="job2Title"
+                value={job2Title}
+                onChange={(e) => { setJob2Title(e.target.value); localStorage.setItem('job2Title', e.target.value); }}
+              ></textarea>
+
+<label htmlFor="job2URL">Job 2 URL:</label>
+              <textarea
+                id="job2URL"
+                name="job2URL"
+                value={job2URL}
+                onChange={(e) => { setJob2URL(e.target.value); localStorage.setItem('job2URL', e.target.value); }}
+              ></textarea>
+              
+               <div className="btn">
+                <input
+                  type="submit"
+                  disabled={!rules.length}
+                  onClick={sendData}
+                />
+              </div>
             </>
+
+            
           )}
         </form>
       )}
