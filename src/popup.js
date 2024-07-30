@@ -373,29 +373,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         if (res && res[0] && res[0].result) {
           let result = res[0].result;
           console.log("result from scrape initial:", result);
-          // console.log("scrap_name")
-          // console.log(result.name)
-          // let scraped_name = await normalize(result.name);
-          // console.log(scraped_name)
-          // setName(scraped_name);
-          // setIndustry(result.industry)
-          // let scraped_followers = await normalize(result.followers);
-          // let totalHeadcount = await normalize(result.headcountGrowth);
-          // let medianTenure = await normalize(result.medianTenure);
-          // let post1text = await normalize(result.post1);
-          // let post2text = await normalize(result.post2);
-          // let post3text = await normalize(result.post3);
-          // let job1titletext = await normalize(result.jobTitle1);
-          // let job2titletext = await normalize(result.jobTitle2);
-          // let job1URLtext = await normalize(result.jobURL1);
-          // let job2URLtext = await normalize(result.jobURL2);
-          // // let industrytext = await normalize(result.industry);
-          // console.log("industry: ")
-          // console.log(result.industry)
-          // console.log(result.medianTenure)
-
-          // setIndustry(industrytext);
-          // localStorage.setItem("company-industry", industrytext);
+ 
 
           setDescription(result.getCompanyOverview)
           setCompanySize(result.companySize)
@@ -645,6 +623,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // send POST request with data to the server
     await axios
       .post(`${backendLink}/api`, {
+        mode: "person",
         owner: owner,
         status: status.label,
         relevant: relevant.label,
@@ -711,18 +690,25 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // send POST request with data to the server
     await axios
       .post(`${backendLink}/api`, {
+        mode: "company",
         owner: owner,
         name: name,
         followers: followers,
         description: description,
         website: website,
-        connections: connections,
-        experience: experience,
-        currentPosition: currentPosition,
-        currentCompany: currentCompany,
-        yearInCurrent: yearInCurrent,
-        currentType: currentType,
-        university: university,
+        industry: industry,
+        companySize: companySize,
+        totalHeadcount: totalHeadcount,
+        medianTenure: medianTenure,
+        hq: hq,
+        specialities: specialities,
+        post1Text: post1Text,
+        post2Text: post2Text,
+        post3Text: post3Text,
+        job1Title: job1Title,
+        job2Title: job2Title,
+        job1URL: job1URL,
+        job2URL: job2URL,
         skills: prepareSkills(skills), //arrays of skills to the strings
         allSkills: prepareSkills(allSkills),
         reachoutTopic: reachoutTopic.label,
@@ -1209,7 +1195,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 <input
                   type="submit"
                   disabled={!rules.length}
-                  onClick={sendData}
+                  onClick={sendData2}
                 />
               </div>
             </>

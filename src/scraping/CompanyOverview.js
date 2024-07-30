@@ -194,13 +194,18 @@ return new Promise((resolve, reject) => {
   function ScrapeJobs() {
     return new Promise((resolve) => {
       setTimeout(() => {
-        clickNextButton();
+        // clickNextButton();
         console.log("whole html: ")
     console.log(document.documentElement.outerHTML);
         // Scrape the first 3 jobs from the specified <ul> element
         let jobs = document.querySelectorAll('ul.artdeco-carousel__slider li');
+        console.log("jobs ul")
+        console.log(jobs)
         for (let i = 0; i < 3 && i < jobs.length; i++) {
+          console.log("in loop")
           let jobTitle = jobs[i].querySelector('div.job-card-square__title span');
+          console.log("jobTitle")
+          console.log(jobTitle)
           let jobURL = jobs[i].querySelector('div.job-card-square__main a');
 
           if (jobTitle) {
