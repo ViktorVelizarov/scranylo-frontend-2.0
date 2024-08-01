@@ -194,9 +194,7 @@ return new Promise((resolve, reject) => {
   function ScrapeJobs() {
     return new Promise((resolve) => {
       setTimeout(() => {
-        // clickNextButton();
-        console.log("whole html: ")
-    console.log(document.documentElement.outerHTML);
+
         // Scrape the first 3 jobs from the specified <ul> element
         let jobs = document.querySelectorAll('ul.artdeco-carousel__slider li');
         console.log("jobs ul")

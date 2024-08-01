@@ -414,17 +414,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         console.error("Error during scraping:", error);
       }
   
-
-
-      currentSkills = res[0].result.skills && res[0].result.skills.length ? res[0].result.skills : [];
-      allSkills = res[0].result.allSkills && res[0].result.allSkills.length ? res[0].result.allSkills : [];
-
-      // Scrape additional skills
-      res = await executeScript(getSkills, [currentRule.skillsRegex, allSkillsRegex]);
-      if (res[0].result.relevantSkills) {
-        currentSkills = currentSkills.concat(res[0].result.relevantSkills);
-      }
-
     } catch (error) {
       console.error("Error during scraping:", error);
     }
@@ -458,7 +447,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           target: {
             tabId: tabId,
           },
-          func: getCompanyOverviewInitial ,
+          func: getInfo ,
           args: [currentRule.skillsRegex, allSkillsRegex],
         },
         // Normalize scraped data and save them to the state and local storage
@@ -623,7 +612,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // send POST request with data to the server
     await axios
       .post(`${backendLink}/api`, {
-        mode: "person",
+        mode: "people",
         owner: owner,
         status: status.label,
         relevant: relevant.label,
@@ -691,8 +680,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     await axios
       .post(`${backendLink}/api`, {
         mode: "company",
-        owner: owner,
         name: name,
+        owner: owner,
         followers: followers,
         description: description,
         website: website,
@@ -717,6 +706,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       })
       .then((res) => {
         // On successful response from the server, update the sourcer's stats
+        console.log("res")
+        console.log(res)
         setStats(res.data.stats);
         // Send a success message to the extension runtime to show popup after upload
         chrome.runtime.sendMessage(
@@ -736,6 +727,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         // Handle any errors that occur during the request (same process as in the findBackNextLinks() function)
         if (err.response.data && err.response.data.error) {
           apiResponse = `API response: ${err.response.data.error}`;
+          console.log("API response")
+          console.log(apiResponse)
         }
         if (
           confirm(
