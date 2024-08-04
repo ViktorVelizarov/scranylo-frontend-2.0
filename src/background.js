@@ -17,7 +17,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       // Sends a message to the tab to open a modal window of the extension (main UI on the right side)
       chrome.tabs.sendMessage(tabId, { type: "openModal" });
       // This listener triggers when a message is received from the runtime.
-      chrome.runtime.onMessage.addListener(function (
+      chrome.runtime.onMessage.addListner(function (
         request,
         sender,
         sendResponse

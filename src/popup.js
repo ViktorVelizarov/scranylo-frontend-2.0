@@ -245,6 +245,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 }
               } else {
                 if (
+                  
                   confirm(
                     'Something went wrong :(\nPress "OK" if you want to copy the error message and then paste it to Slack. Or press "Cancel" to close alert popup.'
                   )

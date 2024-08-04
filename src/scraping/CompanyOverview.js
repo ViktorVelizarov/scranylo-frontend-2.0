@@ -32,14 +32,21 @@ return new Promise((resolve, reject) => {
     info["name"] = nameElement.innerText.trim();
     console.log("Found name:");
     console.log(info["name"]);
-    // If name has parentheses, remove second name of the candidate, for example Egon (Adam) Veermae => Egon Veermae
+
+    // If name has parentheses, remove the text within them and any trailing space
     if (info["name"].indexOf("(") >= 0) {
-      let fullName = info["name"].split(/\(|\)/);
-      fullName.splice(1, 1);
-      fullName = fullName.map((e) => e.trim());
-      info["name"] = fullName.join(" ");
+        let fullName = info["name"].split(/\(|\)/);
+        // Remove the part within parentheses
+        fullName.splice(1, 1);
+        // Trim any extra spaces from each part and filter out empty strings
+        fullName = fullName.map((e) => e.trim()).filter(e => e);
+        // Join the parts back together, ensuring no extra spaces
+        console.log("removed")
+        console.log(fullName)
+        info["name"] = fullName.join(" ");
     }
-  } else {
+}
+else {
     console.log("Name element not found.");
   }
 
