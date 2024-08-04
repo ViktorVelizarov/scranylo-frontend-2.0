@@ -109,6 +109,8 @@ else {
     const overviewElement = getElementByText('section h2', 'Overview');
     if (overviewElement) {
         info["getCompanyOverview"] = overviewElement.nextElementSibling.innerText;
+        console.log("CompanyOverview")
+        console.log(info["getCompanyOverview"])
     }
 
     const websiteElement = getElementByText('dt', 'Website');
@@ -150,6 +152,7 @@ else {
                 jobsLink.click();
                 waitForJobsPageToLoad().then(resolve);
               } else {
+                console.log("Jobs link not found")
                 reject("Jobs link not found");
               }
             }, 1800);
@@ -164,22 +167,29 @@ else {
     });
   }
 
-  // Function to wait for the jobs page to load
-  function waitForJobsPageToLoad() {
-    return new Promise((resolve, reject) => {
-      let observer = new MutationObserver((mutations, observer) => {
-        let jobsPageLoaded = document.querySelector('ul.artdeco-carousel__slider li');
-        if (jobsPageLoaded) {
-          observer.disconnect(); // Stop observing
-          console.log("Jobs page loaded");
-          resolve(ScrapeJobs());
-        }
-      });
-
-      // Start observing the document for changes
-      observer.observe(document, { childList: true, subtree: true });
+// Function to wait for the jobs page to load
+function waitForJobsPageToLoad() {
+  return new Promise((resolve, reject) => {
+    let observer = new MutationObserver((mutations, observer) => {
+      let jobsPageLoaded = document.querySelector('ul.artdeco-carousel__slider li');
+      if (jobsPageLoaded) {
+        observer.disconnect(); // Stop observing
+        console.log("Jobs page loaded");
+        resolve(ScrapeJobs());
+      }
     });
-  }
+
+    // Start observing the document for changes
+    observer.observe(document, { childList: true, subtree: true });
+
+    // Set a timeout to stop waiting after a certain period
+    setTimeout(() => {
+      observer.disconnect(); // Stop observing after timeout
+      console.log("Timeout waiting for jobs page to load");
+      resolve(); // Proceed without job scraping
+    }, 2000); // Adjust timeout duration as needed (e.g., 10000 ms = 10 seconds)
+  });
+}
 
   let postContents = [];
   function ScrapePost() {
