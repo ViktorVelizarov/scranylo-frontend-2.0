@@ -187,7 +187,7 @@ function waitForJobsPageToLoad() {
       observer.disconnect(); // Stop observing after timeout
       console.log("Timeout waiting for jobs page to load");
       resolve(); // Proceed without job scraping
-    }, 2000); // Adjust timeout duration as needed (e.g., 10000 ms = 10 seconds)
+    }, 1500); // Adjust timeout duration as needed (e.g., 10000 ms = 10 seconds)
   });
 }
 
@@ -266,6 +266,13 @@ function waitForJobsPageToLoad() {
   info["post1"] = uniquePostContents[0];
   info["post2"] = uniquePostContents[1];
   info["post3"] = uniquePostContents[2];
+
+  // Add the current datetime up to minutes to the info object
+  let currentDate = new Date();
+  info["scraped_date"] = currentDate.toISOString().slice(0, 16).replace('T', ' '); // Format as 'YYYY-MM-DD HH:mm'
+
+  console.log("info with scraped_date");
+  console.log(info);
 
   // Proceed with navigating to the company "About" page
   navigateToAboutPage().then(() => {

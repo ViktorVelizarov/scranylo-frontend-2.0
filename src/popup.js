@@ -112,7 +112,7 @@ const [job1Title, setJob1Title] = useState(localStorage.getItem('company-job1Tit
 const [job2Title, setJob2Title] = useState(localStorage.getItem('company-job2Title') || '');
 const [job1URL, setJob1URL] = useState(localStorage.getItem('company-job1URL') || '');
 const [job2URL, setJob2URL] = useState(localStorage.getItem('company-job2URL') || '');
-
+const [date, setDate] = useState(localStorage.getItem('company-date') || '');
 
   // regex for skills relevant for our database (all jobs)
   const [allSkillsRegex, setAllSkillsRegex] = useState("");
@@ -406,6 +406,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           // localStorage.setItem("company-job1URL", job1URLtext);
           setJob2URL(result.jobURL2);
           // localStorage.setItem("company-job2URL", job2URLtext);
+          setDate(result.scraped_date);
 
         } else {
           console.error("Failed to get the expected result structure from executeScript");
@@ -699,6 +700,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         job2Title: job2Title,
         job1URL: job1URL,
         job2URL: job2URL,
+        date: date,
         skills: prepareSkills(skills), //arrays of skills to the strings
         allSkills: prepareSkills(allSkills),
         reachoutTopic: reachoutTopic.label,
