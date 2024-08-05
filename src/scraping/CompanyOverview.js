@@ -269,6 +269,7 @@ function waitForJobsPageToLoad() {
 
   // Add the current datetime up to minutes to the info object
   let currentDate = new Date();
+  currentDate.setHours(currentDate.getHours() + 2); // Add 2 hours
   info["scraped_date"] = currentDate.toISOString().slice(0, 16).replace('T', ' '); // Format as 'YYYY-MM-DD HH:mm'
 
   console.log("info with scraped_date");

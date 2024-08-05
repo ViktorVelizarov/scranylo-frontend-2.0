@@ -635,6 +635,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       })
       .then((res) => {
         // On successful response from the server, update the sourcer's stats
+        console.log("after post")
+        console.log("res:")
+        console.log(res)
         setStats(res.data.stats);
         // Send a success message to the extension runtime to show popup after upload
         chrome.runtime.sendMessage(
@@ -679,6 +682,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       alert("Owner is empty");
     }
     // send POST request with data to the server
+    console.log("before post")
     await axios
       .post(`${backendLink}/api`, {
         mode: "company",
@@ -709,7 +713,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       })
       .then((res) => {
         // On successful response from the server, update the sourcer's stats
-        console.log("res")
+        console.log("after post")
+        console.log("res:")
         console.log(res)
         setStats(res.data.stats);
         // Send a success message to the extension runtime to show popup after upload
@@ -735,7 +740,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         }
         if (
           confirm(
-            'Something went wrong :(\nPress "OK" if you want to copy the error message and then paste it to Slack. Or press "Cancel" to close alert popup.'
+            'Something went wrong :() \nPress "OK" if you want to copy the error message and then paste it to Slack. Or press "Cancel" to close alert popup.'
           )
         ) {
           const error = `Url: ${url}\nName: ${name}\nError message: ${err.message}\nError code: ${err.code}\n${apiResponse}`;
