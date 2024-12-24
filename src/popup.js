@@ -831,7 +831,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                   setStatus(selectedOption);
                   localStorage.setItem('status', JSON.stringify(selectedOption));
                 }}
-                options={[] /* Add your options here */}
+                options={statusOptions}
                 components={{ Input: CustomInput }}
               />
               <label htmlFor="url">Current url:</label>
@@ -1010,7 +1010,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                   setReachoutTopic(selectedOption);
                   localStorage.setItem('reachoutTopic', JSON.stringify(selectedOption));
                 }}
-                options={[] /* Add your options here */}
+                options={reachoutTopicOptions}
                 components={{ Input: CustomInput }}
               />
               <label htmlFor="reachoutComment">Reach out comment:</label>
@@ -1027,7 +1027,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                   setRelevant(selectedOption);
                   localStorage.setItem('relevant', JSON.stringify(selectedOption));
                 }}
-                options={[] /* Add your options here */}
+                options={relevantOptions}
                 components={{ Input: CustomInput }}
               />
               <div className="btn">
